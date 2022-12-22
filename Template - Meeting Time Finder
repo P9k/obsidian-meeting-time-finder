@@ -1,0 +1,88 @@
+
+<%*
+// Declare functions:
+
+// Get time in timezone printed in HH:mm format with minutes set to zero (e.g. 13:00) and shift by certain amount of hours (with default being "0")
+const getTimeInTimeZone = (timeZone, hour=0) => {
+const date = new Date();
+return moment(date.toLocaleString('sv-SE', {timeZone})).add(hour, 'h').format('HH:00 (dd, D. MMM)');
+};
+
+// Get current time in timezone printed in HH:mm format (e.g. 13:45) and shift by certain amount of hours (with default being "0")
+const getCurrentTimeInTimeZone = (timeZone, hour=0) => {
+const date = new Date();
+return moment(date.toLocaleString('sv-SE', {timeZone})).add(hour, 'h').format('HH:mm (dd, D. MMM)');
+};
+
+// Assign color code to time periods (un)suitable for meetings.
+// During daytime (8:00-17:00) -> green
+// Early mornings and early evenings -> orange
+// Very early mornings and late nights -> red
+const TimeColor = (timeZone, hour=0) => {
+const date = new Date();
+const d = moment(date.toLocaleString('sv-SE', {timeZone})).add(hour, 'h').format('HH:00');
+
+if ( d.includes("08:00") || d.includes("09:00") || d.includes("10:00") || d.includes("11:00") || d.includes("12:00") || d.includes("13:00") || d.includes("14:00") || d.includes("15:00") || d.includes("16:00") || d.includes("17:00") ){
+return color='lightgreen';
+} else if ( d.includes("06:00") || d.includes("07:00") || d.includes("17:00") || d.includes("18:00") || d.includes("19:00") || d.includes("20:00") ){
+return color='orange';
+} else {
+return color='red';
+};
+};
+
+%>
+
+<%*
+// Assign city names and respective time zones
+city1 = "Auckland";
+city2 = "Hamburg";
+city3 = "San Francisco";
+
+timezonecity1 = 'Pacific/Auckland';
+timezonecity2 = 'Europe/Berlin';
+timezonecity3 = 'America/Los_Angeles';
+%>
+
+Meeting Time Overview
+<%*
+// Construct table header in Markdown format
+tR += "\n" +
+"| " + city1 + " | "+ city2 + " | " + city3 + " |" + "\n"
++ "|: " + "--------" + " :|: "+ "--------" + " :|: " + "--------" + " :|" + "\n";
+
+// Loop through hours of the days to cover 24 hours
+for ( var i = -13; i < 11; i++ ){;
+
+// For the current time in the respective time zones, don't do any formatting and show the time including minutes.
+if (i == 0) {
+tR += "| " +
+"" + getCurrentTimeInTimeZone(timezonecity1,i) + "" +
+" |" +
+"" + getCurrentTimeInTimeZone(timezonecity2,i) + "" +
+" |" +
+"" + getCurrentTimeInTimeZone(timezonecity3,i) + "" +
+" |" +
+"\n";
+continue;
+};
+
+// Select format for coloring of entry based on position of respective local in the spectrum of (un)suitable times
+formatCity1 = "" + getTimeInTimeZone(timezonecity1,i) + "";
+
+formatCity2 = "" + getTimeInTimeZone(timezonecity2,i) + "";
+
+formatCity3 = "" + getTimeInTimeZone(timezonecity3,i) + "";
+
+// Finish table construction
+tR += "| " +
+formatCity1 +
+" |" +
+formatCity2 +
+" |" +
+formatCity3 +
+" |" +
+"\n";
+};
+
+%>
